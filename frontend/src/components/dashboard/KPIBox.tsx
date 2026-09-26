@@ -1,25 +1,32 @@
 import { Card, Typography } from "@mui/material";
 
+interface Props {
+  title: string;
+  value: string | number;
+}
+
 export default function KPIBox({
   title,
-  value,
-}: {
-  title: string;
-
-  value: number;
-}) {
+  value
+}: Props) {
   return (
     <Card
       sx={{
-        padding: 3,
-        borderRadius: 4,
+        p: 3,
+        borderRadius: 4
       }}
     >
-      <Typography color="gray">
+      <Typography
+        color="text.secondary"
+        variant="body2"
+      >
         {title}
       </Typography>
 
-      <Typography variant="h4">
+      <Typography
+        variant="h4"
+        fontWeight={700}
+      >
         {value}
       </Typography>
     </Card>
