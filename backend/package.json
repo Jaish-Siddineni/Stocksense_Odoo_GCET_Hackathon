@@ -6,7 +6,7 @@
   "type": "commonjs",
 
   "prisma": {
-  "schema": "./src/prisma/schema.prisma"
+  "schema": "./prisma/schema.prisma"
 },
 
   "scripts": {

@@ -1,4 +1,7 @@
-import { Card, Typography } from "@mui/material";
+import {
+  Card,
+  Typography,
+} from "@mui/material";
 
 interface Props {
   title: string;
@@ -7,13 +10,13 @@ interface Props {
 
 export default function KPIBox({
   title,
-  value
+  value,
 }: Props) {
   return (
     <Card
       sx={{
         p: 3,
-        borderRadius: 4
+        borderRadius: 4,
       }}
     >
       <Typography

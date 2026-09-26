@@ -7,33 +7,16 @@ import {
   Typography,
 } from "@mui/material";
 
-import { useState } from "react";
-
-import { v4 as uuid } from "uuid";
-
 import {
-  useProductStore,
-} from "../../store/productStore";
+  useState,
+  useEffect,
+} from "react";
 
-import {
-  useReceiptStore,
-} from "../../store/receiptStore";
+import { api } from "../../services/api";
 
 export default function ReceiptForm() {
-  const products =
-    useProductStore(
-      (state) => state.products
-    );
-
-  const updateStock =
-    useProductStore(
-      (state) => state.updateStock
-    );
-
-  const addReceipt =
-    useReceiptStore(
-      (state) => state.addReceipt
-    );
+  const [products, setProducts] =
+    useState([]);
 
   const [productId, setProductId] =
     useState("");
@@ -44,39 +27,48 @@ export default function ReceiptForm() {
   const [supplier, setSupplier] =
     useState("");
 
-  const saveReceipt = () => {
-    if (
-      !productId ||
-      !quantity ||
-      !supplier
-    ) {
-      alert(
-        "Please fill all fields"
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const fetchProducts =
+    async () => {
+      const response =
+        await api.get(
+          "/products"
+        );
+
+      setProducts(
+        response.data
       );
-      return;
-    }
+    };
 
-    const qty =
-      Number(quantity);
+  const saveReceipt =
+    async () => {
+      try {
+        await api.post(
+          "/receipts",
+          {
+            productId,
+            quantity:
+              Number(
+                quantity
+              ),
+            supplier,
+          }
+        );
 
-    addReceipt({
-      id: uuid(),
-      productId,
-      quantity: qty,
-      supplier,
-      receiptDate:
-        new Date().toISOString(),
-    });
+        alert(
+          "Receipt created"
+        );
 
-    updateStock(
-      productId,
-      qty
-    );
-
-    setProductId("");
-    setQuantity("");
-    setSupplier("");
-  };
+        setProductId("");
+        setQuantity("");
+        setSupplier("");
+      } catch (error) {
+        console.error(error);
+      }
+    };
 
   return (
     <Card sx={{ p: 3 }}>
@@ -97,30 +89,36 @@ export default function ReceiptForm() {
               e.target.value
             )
           }
-          fullWidth
         >
           {products.map(
-            (product) => (
+            (
+              product: any
+            ) => (
               <MenuItem
-                key={product.id}
-                value={product.id}
+                key={
+                  product.id
+                }
+                value={
+                  product.id
+                }
               >
-                {product.name}
+                {
+                  product.name
+                }
               </MenuItem>
             )
           )}
         </TextField>
 
         <TextField
-          label="Quantity"
           type="number"
+          label="Quantity"
           value={quantity}
           onChange={(e) =>
             setQuantity(
               e.target.value
             )
           }
-          fullWidth
         />
 
         <TextField
@@ -131,12 +129,13 @@ export default function ReceiptForm() {
               e.target.value
             )
           }
-          fullWidth
         />
 
         <Button
           variant="contained"
-          onClick={saveReceipt}
+          onClick={
+            saveReceipt
+          }
         >
           Save Receipt
         </Button>

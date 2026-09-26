@@ -5,37 +5,38 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  Typography,
 } from "@mui/material";
 
 import {
-  useReceiptStore,
-} from "../../store/receiptStore";
+  useEffect,
+  useState,
+} from "react";
 
-import {
-  useProductStore,
-} from "../../store/productStore";
+import { api } from "../../services/api";
 
 export default function ReceiptTable() {
-  const receipts =
-    useReceiptStore(
-      (state) => state.receipts
-    );
+  const [receipts, setReceipts] =
+    useState([]);
 
-  const products =
-    useProductStore(
-      (state) => state.products
-    );
+  useEffect(() => {
+    fetchReceipts();
+  }, []);
 
-  if (
-    receipts.length === 0
-  ) {
-    return (
-      <Typography>
-        No receipts found.
-      </Typography>
-    );
-  }
+  const fetchReceipts =
+    async () => {
+      try {
+        const response =
+          await api.get(
+            "/receipts"
+          );
+
+        setReceipts(
+          response.data
+        );
+      } catch (error) {
+        console.error(error);
+      }
+    };
 
   return (
     <Paper>
@@ -62,43 +63,40 @@ export default function ReceiptTable() {
 
         <TableBody>
           {receipts.map(
-            (receipt) => {
-              const product =
-                products.find(
-                  (p) =>
-                    p.id ===
-                    receipt.productId
-                );
+            (
+              receipt: any
+            ) => (
+              <TableRow
+                key={
+                  receipt.id
+                }
+              >
+                <TableCell>
+                  {
+                    receipt.product
+                      ?.name
+                  }
+                </TableCell>
 
-              return (
-                <TableRow
-                  key={receipt.id}
-                >
-                  <TableCell>
-                    {product?.name ??
-                      "Deleted Product"}
-                  </TableCell>
+                <TableCell>
+                  {
+                    receipt.quantity
+                  }
+                </TableCell>
 
-                  <TableCell>
-                    {
-                      receipt.quantity
-                    }
-                  </TableCell>
+                <TableCell>
+                  {
+                    receipt.supplier
+                  }
+                </TableCell>
 
-                  <TableCell>
-                    {
-                      receipt.supplier
-                    }
-                  </TableCell>
-
-                  <TableCell>
-                    {new Date(
-                      receipt.receiptDate
-                    ).toLocaleDateString()}
-                  </TableCell>
-                </TableRow>
-              );
-            }
+                <TableCell>
+                  {new Date(
+                    receipt.receiptDate
+                  ).toLocaleDateString()}
+                </TableCell>
+              </TableRow>
+            )
           )}
         </TableBody>
       </Table>

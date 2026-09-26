@@ -1,23 +1,95 @@
 import {
   Card,
+  Typography,
   List,
   ListItem,
-  Typography
+  ListItemText,
+  CircularProgress,
 } from "@mui/material";
 
-const activities = [
-  "Receipt WH/IN/001 Created",
-  "Delivery WH/OUT/002 Completed",
-  "Warehouse Updated",
-  "Stock Adjusted"
-];
+import {
+  useEffect,
+  useState,
+} from "react";
+
+import { api } from "../../services/api";
+
+interface Activity {
+  text: string;
+  createdAt: string;
+}
 
 export default function RecentActivity() {
+  const [activities, setActivities] =
+    useState<Activity[]>([]);
+
+  const [loading, setLoading] =
+    useState(true);
+
+  useEffect(() => {
+    const fetchActivities =
+      async () => {
+        try {
+          const [
+            receiptsRes,
+            deliveriesRes,
+          ] = await Promise.all([
+            api.get("/receipts"),
+            api.get("/deliveries"),
+          ]);
+
+          const receiptActivities =
+            receiptsRes.data.map(
+              (receipt: any) => ({
+                text: `Receipt from ${receipt.supplier}`,
+                createdAt:
+                  receipt.receiptDate,
+              })
+            );
+
+          const deliveryActivities =
+            deliveriesRes.data.map(
+              (delivery: any) => ({
+                text: `Delivery to ${delivery.customer}`,
+                createdAt:
+                  delivery.deliveryDate,
+              })
+            );
+
+          const merged = [
+            ...receiptActivities,
+            ...deliveryActivities,
+          ]
+            .sort(
+              (a, b) =>
+                new Date(
+                  b.createdAt
+                ).getTime() -
+                new Date(
+                  a.createdAt
+                ).getTime()
+            )
+            .slice(0, 10);
+
+          setActivities(merged);
+        } catch (error) {
+          console.error(
+            "Failed to load activities",
+            error
+          );
+        } finally {
+          setLoading(false);
+        }
+      };
+
+    fetchActivities();
+  }, []);
+
   return (
     <Card
       sx={{
         p: 2,
-        borderRadius: 4
+        borderRadius: 4,
       }}
     >
       <Typography
@@ -27,13 +99,39 @@ export default function RecentActivity() {
         Recent Activity
       </Typography>
 
-      <List>
-        {activities.map((activity) => (
-          <ListItem key={activity}>
-            {activity}
-          </ListItem>
-        ))}
-      </List>
+      {loading ? (
+        <CircularProgress />
+      ) : (
+        <List>
+          {activities.length === 0 ? (
+            <ListItem>
+              <ListItemText
+                primary="No activity found"
+              />
+            </ListItem>
+          ) : (
+            activities.map(
+              (
+                activity,
+                index
+              ) => (
+                <ListItem
+                  key={index}
+                >
+                  <ListItemText
+                    primary={
+                      activity.text
+                    }
+                    secondary={new Date(
+                      activity.createdAt
+                    ).toLocaleString()}
+                  />
+                </ListItem>
+              )
+            )
+          )}
+        </List>
+      )}
     </Card>
   );
 }

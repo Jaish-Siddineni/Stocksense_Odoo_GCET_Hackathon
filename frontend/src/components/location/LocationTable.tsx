@@ -1,90 +1,90 @@
 import {
-  Paper,
   Table,
   TableBody,
   TableCell,
-  TableContainer,
   TableHead,
   TableRow,
-  Typography,
+  Paper,
 } from "@mui/material";
 
-import { useLocationStore } from "../../store/locationStore";
-import { useWarehouseStore } from "../../store/warehouseStore";
+import {
+  useEffect,
+  useState,
+} from "react";
+
+import { api } from "../../services/api";
 
 export default function LocationTable() {
-  const locations = useLocationStore(
-    (state) => state.locations
-  );
+  const [locations, setLocations] =
+    useState<any[]>([]);
 
-  const warehouses = useWarehouseStore(
-    (state) => state.warehouses
-  );
+  useEffect(() => {
+    loadLocations();
+  }, []);
+
+  const loadLocations =
+    async () => {
+      const res =
+        await api.get(
+          "/locations"
+        );
+
+      setLocations(
+        res.data
+      );
+    };
 
   return (
-    <TableContainer component={Paper}>
+    <Paper>
       <Table>
         <TableHead>
           <TableRow>
             <TableCell>
-              <strong>Location</strong>
+              Location
             </TableCell>
 
             <TableCell>
-              <strong>Short Code</strong>
+              Code
             </TableCell>
 
             <TableCell>
-              <strong>Warehouse</strong>
+              Warehouse
             </TableCell>
           </TableRow>
         </TableHead>
 
         <TableBody>
-          {locations.length === 0 ? (
-            <TableRow>
-              <TableCell
-                colSpan={3}
-                align="center"
+          {locations.map(
+            (location) => (
+              <TableRow
+                key={
+                  location.id
+                }
               >
-                <Typography
-                  color="text.secondary"
-                >
-                  No locations found
-                </Typography>
-              </TableCell>
-            </TableRow>
-          ) : (
-            locations.map((location) => {
-              const warehouse =
-                warehouses.find(
-                  (w) =>
-                    w.id ===
-                    location.warehouseId
-                );
+                <TableCell>
+                  {
+                    location.name
+                  }
+                </TableCell>
 
-              return (
-                <TableRow
-                  key={location.id}
-                >
-                  <TableCell>
-                    {location.name}
-                  </TableCell>
+                <TableCell>
+                  {
+                    location.shortCode
+                  }
+                </TableCell>
 
-                  <TableCell>
-                    {location.shortCode}
-                  </TableCell>
-
-                  <TableCell>
-                    {warehouse?.name ??
-                      "Unknown"}
-                  </TableCell>
-                </TableRow>
-              );
-            })
+                <TableCell>
+                  {
+                    location
+                      .warehouse
+                      ?.name
+                  }
+                </TableCell>
+              </TableRow>
+            )
           )}
         </TableBody>
       </Table>
-    </TableContainer>
+    </Paper>
   );
 }

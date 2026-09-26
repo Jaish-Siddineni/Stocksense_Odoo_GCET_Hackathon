@@ -1,20 +1,43 @@
+import { useEffect, useState } from "react";
+
 import {
   BarChart,
   Bar,
   XAxis,
   YAxis,
   Tooltip,
-  ResponsiveContainer
+  ResponsiveContainer,
 } from "recharts";
 
-const data = [
-  { name: "Desk", stock: 50 },
-  { name: "Chair", stock: 30 },
-  { name: "Laptop", stock: 12 },
-  { name: "Monitor", stock: 20 }
-];
+import { api } from "../../services/api";
+
+interface Product {
+  id: string;
+  name: string;
+  stock: number;
+}
 
 export default function InventoryChart() {
+  const [data, setData] = useState<Product[]>([]);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response =
+          await api.get("/products");
+
+        setData(response.data);
+      } catch (error) {
+        console.error(
+          "Failed to load inventory chart",
+          error
+        );
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
   return (
     <ResponsiveContainer
       width="100%"
@@ -22,8 +45,11 @@ export default function InventoryChart() {
     >
       <BarChart data={data}>
         <XAxis dataKey="name" />
+
         <YAxis />
+
         <Tooltip />
+
         <Bar dataKey="stock" />
       </BarChart>
     </ResponsiveContainer>

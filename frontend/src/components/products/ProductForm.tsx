@@ -7,16 +7,9 @@ import {
 
 import { useState } from "react";
 
-import { v4 as uuid } from "uuid";
-
-import { useProductStore } from "../../store/productStore";
+import { api } from "../../services/api";
 
 export default function ProductForm() {
-  const addProduct =
-    useProductStore(
-      (state) => state.addProduct
-    );
-
   const [name, setName] =
     useState("");
 
@@ -29,20 +22,28 @@ export default function ProductForm() {
   const [price, setPrice] =
     useState("");
 
-  const saveProduct = () => {
-    addProduct({
-      id: uuid(),
-      name,
-      sku,
-      category,
-      stock: 0,
-      price: Number(price),
-    });
+  const saveProduct = async () => {
+    try {
+      await api.post("/products", {
+        name,
+        sku,
+        category,
+        price: Number(price),
+        stock: 0,
+      });
 
-    setName("");
-    setSku("");
-    setCategory("");
-    setPrice("");
+      alert("Product created");
+
+      setName("");
+      setSku("");
+      setCategory("");
+      setPrice("");
+
+      window.location.reload();
+    } catch (error) {
+      console.error(error);
+      alert("Failed to create product");
+    }
   };
 
   return (
@@ -74,6 +75,7 @@ export default function ProductForm() {
 
         <TextField
           label="Price"
+          type="number"
           value={price}
           onChange={(e) =>
             setPrice(e.target.value)

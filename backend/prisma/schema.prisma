@@ -100,3 +100,8 @@ model StockMovement {
   referenceId  String?
   createdAt    DateTime @default(now())
 }
+model Setting {
+  id          String @id @default(uuid())
+  companyName String
+  adminEmail  String
+}

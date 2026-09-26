@@ -4,53 +4,85 @@ import {
   TableCell,
   TableHead,
   TableRow,
+  Paper,
 } from "@mui/material";
 
 import {
-  useWarehouseStore,
-} from "../../store/warehouseStore";
+  useEffect,
+  useState,
+} from "react";
+
+import { api } from "../../services/api";
 
 export default function WarehouseTable() {
-  const warehouses =
-    useWarehouseStore(
-      (state) => state.warehouses
-    );
+  const [warehouses, setWarehouses] =
+    useState<any[]>([]);
+
+  useEffect(() => {
+    loadWarehouses();
+  }, []);
+
+  const loadWarehouses =
+    async () => {
+      const res =
+        await api.get(
+          "/warehouses"
+        );
+
+      setWarehouses(
+        res.data
+      );
+    };
 
   return (
-    <Table>
-      <TableHead>
-        <TableRow>
-          <TableCell>Name</TableCell>
-
-          <TableCell>
-            Short Code
-          </TableCell>
-
-          <TableCell>
-            Address
-          </TableCell>
-        </TableRow>
-      </TableHead>
-
-      <TableBody>
-        {warehouses.map((warehouse) => (
-          <TableRow
-            key={warehouse.id}
-          >
+    <Paper>
+      <Table>
+        <TableHead>
+          <TableRow>
             <TableCell>
-              {warehouse.name}
+              Name
             </TableCell>
 
             <TableCell>
-              {warehouse.shortCode}
+              Code
             </TableCell>
 
             <TableCell>
-              {warehouse.address}
+              Address
             </TableCell>
           </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+        </TableHead>
+
+        <TableBody>
+          {warehouses.map(
+            (warehouse) => (
+              <TableRow
+                key={
+                  warehouse.id
+                }
+              >
+                <TableCell>
+                  {
+                    warehouse.name
+                  }
+                </TableCell>
+
+                <TableCell>
+                  {
+                    warehouse.shortCode
+                  }
+                </TableCell>
+
+                <TableCell>
+                  {
+                    warehouse.address
+                  }
+                </TableCell>
+              </TableRow>
+            )
+          )}
+        </TableBody>
+      </Table>
+    </Paper>
   );
 }

@@ -6,19 +6,48 @@ import {
   TableBody,
   TableRow,
   TableCell,
+  CircularProgress,
 } from "@mui/material";
 
-const movements = [
-  {
-    id: "MOV001",
-    product: "Office Chair",
-    from: "WH001",
-    to: "WH002",
-    qty: 10,
-  },
-];
+import { useEffect, useState } from "react";
+import { api } from "../../services/api";
+
+interface Movement {
+  id: string;
+  productId: string;
+  movementType: string;
+  quantity: number;
+  referenceId: string;
+  createdAt: string;
+}
 
 export default function MoveHistoryPage() {
+  const [movements, setMovements] =
+    useState<Movement[]>([]);
+
+  const [loading, setLoading] =
+    useState(true);
+
+  useEffect(() => {
+    fetchMovements();
+  }, []);
+
+  const fetchMovements = async () => {
+    try {
+      const res =
+        await api.get("/movements");
+
+      setMovements(res.data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading)
+    return <CircularProgress />;
+
   return (
     <Card sx={{ p: 3 }}>
       <Typography
@@ -32,25 +61,61 @@ export default function MoveHistoryPage() {
         <TableHead>
           <TableRow>
             <TableCell>ID</TableCell>
-            <TableCell>Product</TableCell>
-            <TableCell>From</TableCell>
-            <TableCell>To</TableCell>
-            <TableCell>Qty</TableCell>
+
+            <TableCell>
+              Type
+            </TableCell>
+
+            <TableCell>
+              Quantity
+            </TableCell>
+
+            <TableCell>
+              Reference
+            </TableCell>
+
+            <TableCell>
+              Date
+            </TableCell>
           </TableRow>
         </TableHead>
 
         <TableBody>
-          {movements.map((movement) => (
-            <TableRow key={movement.id}>
-              <TableCell>{movement.id}</TableCell>
-              <TableCell>
-                {movement.product}
-              </TableCell>
-              <TableCell>{movement.from}</TableCell>
-              <TableCell>{movement.to}</TableCell>
-              <TableCell>{movement.qty}</TableCell>
-            </TableRow>
-          ))}
+          {movements.map(
+            (movement) => (
+              <TableRow
+                key={movement.id}
+              >
+                <TableCell>
+                  {movement.id}
+                </TableCell>
+
+                <TableCell>
+                  {
+                    movement.movementType
+                  }
+                </TableCell>
+
+                <TableCell>
+                  {
+                    movement.quantity
+                  }
+                </TableCell>
+
+                <TableCell>
+                  {
+                    movement.referenceId
+                  }
+                </TableCell>
+
+                <TableCell>
+                  {new Date(
+                    movement.createdAt
+                  ).toLocaleDateString()}
+                </TableCell>
+              </TableRow>
+            )
+          )}
         </TableBody>
       </Table>
     </Card>
