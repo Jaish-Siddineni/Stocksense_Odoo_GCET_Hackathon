@@ -4,7 +4,6 @@
   "description": "StockSense Inventory Management Backend",
   "main": "dist/server.js",
   "type": "commonjs",
-
   "prisma": {
   "schema": "./prisma/schema.prisma"
 },
@@ -13,7 +12,6 @@
     "dev": "tsx watch src/server.ts",
     "start": "node dist/server.js",
     "build": "tsc",
-
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:deploy": "prisma migrate deploy",
@@ -21,7 +19,6 @@
     "prisma:studio": "prisma studio",
     "prisma:seed": "tsx prisma/seed.ts"
   },
-
   "keywords": [
     "stocksense",
     "inventory",
@@ -29,10 +26,8 @@
     "prisma",
     "mysql"
   ],
-
   "author": "",
   "license": "ISC",
-
   "dependencies": {
     "@prisma/client": "^6.16.3",
     "bcryptjs": "^2.4.3",
@@ -46,7 +41,6 @@
     "uuid": "^11.1.0",
     "zod": "^4.1.11"
   },
-
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
     "@types/cors": "^2.8.19",
