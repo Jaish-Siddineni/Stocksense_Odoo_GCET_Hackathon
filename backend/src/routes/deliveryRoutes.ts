@@ -1,30 +1,45 @@
+// import {
+//   Request,
+//   Response,
+// } from "express";
+
+// import * as deliveryService from "../services/deliveryService";
+
+// export const getDeliveries =
+//   async (
+//     req: Request,
+//     res: Response
+//   ) => {
+//     const deliveries =
+//       await deliveryService.getDeliveries();
+
+//     res.json(deliveries);
+//   };
+
+// export const createDelivery =
+//   async (
+//     req: Request,
+//     res: Response
+//   ) => {
+//     const delivery =
+//       await deliveryService.createDelivery(
+//         req.body
+//       );
+
+//     res.status(201).json(delivery);
+//   };
+
+import { Router } from "express";
+
 import {
-  Request,
-  Response,
-} from "express";
+  getDeliveries,
+  createDelivery,
+} from "../controllers/deliveries/deliveryController";
 
-import * as deliveryService from "../../services/deliveryService";
+const router = Router();
 
-export const getDeliveries =
-  async (
-    req: Request,
-    res: Response
-  ) => {
-    const deliveries =
-      await deliveryService.getDeliveries();
+router.get("/", getDeliveries);
 
-    res.json(deliveries);
-  };
+router.post("/", createDelivery);
 
-export const createDelivery =
-  async (
-    req: Request,
-    res: Response
-  ) => {
-    const delivery =
-      await deliveryService.createDelivery(
-        req.body
-      );
-
-    res.status(201).json(delivery);
-  };
+export default router;
