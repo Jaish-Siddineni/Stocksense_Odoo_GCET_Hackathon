@@ -1,73 +1,91 @@
 import bcrypt from "bcryptjs";
-
 import jwt from "jsonwebtoken";
+import { prisma } from "../config/db";
 
-const users: any[] = [];
+export const register = async (
+  name: string,
+  email: string,
+  password: string
+) => {
+  // Check if user already exists
+  const existingUser = await prisma.user.findUnique({
+    where: {
+      email,
+    },
+  });
 
-export const register =
-  async (
-    name: string,
-    email: string,
-    password: string
-  ) => {
-    const hashed =
-      await bcrypt.hash(
-        password,
-        10
-      );
+  if (existingUser) {
+    throw new Error("Email already registered");
+  }
 
-    const user = {
-      id: Date.now().toString(),
+  // Hash password before storing it
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  // Create user in MySQL through Prisma
+  const user = await prisma.user.create({
+    data: {
       name,
       email,
-      password: hashed,
-    };
+      password: hashedPassword,
+      role: "WAREHOUSE_STAFF", // Default role
+    },
+  });
 
-    users.push(user);
-
-    return user;
+  // Never return the password
+  return {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    createdAt: user.createdAt,
   };
+};
 
-export const login =
-  async (
-    email: string,
-    password: string
-  ) => {
-    const user = users.find(
-      (u) => u.email === email
-    );
+export const login = async (
+  email: string,
+  password: string
+) => {
+  // Find user in MySQL
+  const user = await prisma.user.findUnique({
+    where: {
+      email,
+    },
+  });
 
-    if (!user)
-      throw new Error(
-        "User not found"
-      );
+  if (!user) {
+    throw new Error("Invalid credentials");
+  }
 
-    const valid =
-      await bcrypt.compare(
-        password,
-        user.password
-      );
+  // Compare entered password with hashed password
+  const validPassword = await bcrypt.compare(
+    password,
+    user.password
+  );
 
-    if (!valid)
-      throw new Error(
-        "Invalid credentials"
-      );
+  if (!validPassword) {
+    throw new Error("Invalid credentials");
+  }
 
-    const token =
-      jwt.sign(
-        {
-          id: user.id,
-          email: user.email,
-        },
-        process.env.JWT_SECRET ||
-          "secret",
-        {
-          expiresIn: "7d",
-        }
-      );
+  // Create JWT
+  const token = jwt.sign(
+    {
+      id: user.id,
+      email: user.email,
+      role: user.role,
+    },
+    process.env.JWT_SECRET || "",
+    {
+      expiresIn: "7d",
+    }
+  );
 
-    return {
-      token,
-      user,
-    };
+  return {
+    token,
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    },
   };
+};
