@@ -102,3 +102,21 @@ export const authMiddleware = (
     });
   }
 };
+
+export const managerOnly = (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+): void => {
+  if (!req.user) {
+    res.status(401).json({ message: "Authentication required" });
+    return;
+  }
+
+  if (req.user.role !== "INVENTORY_MANAGER") {
+    res.status(403).json({ message: "Manager access required" });
+    return;
+  }
+
+  next();
+};

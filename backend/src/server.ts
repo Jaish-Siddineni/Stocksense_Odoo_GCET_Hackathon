@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 
 import authRoutes from "./routes/authRoutes";
+import managerRoutes from "./routes/managerRoutes";
 import productRoutes from "./routes/productRoutes";
 import receiptRoutes from "./routes/receiptRoutes";
 import deliveryRoutes from "./routes/deliveryRoutes";
@@ -31,6 +32,8 @@ app.get("/", (_, res) => {
 });
 
 app.use("/api/auth", authRoutes);
+
+app.use("/api/managers", managerRoutes);
 
 app.use("/api/products", productRoutes);
 

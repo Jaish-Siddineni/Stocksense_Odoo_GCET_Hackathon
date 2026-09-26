@@ -5,7 +5,8 @@
   "main": "dist/server.js",
   "type": "commonjs",
   "prisma": {
-    "schema": "./prisma/schema.prisma"
+    "schema": "./prisma/schema.prisma",
+    "seed": "tsx prisma/seed.ts"
   },
   "scripts": {
     "dev": "tsx watch src/server.ts",
@@ -37,6 +38,7 @@
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
     "mysql2": "^3.14.5",
+    "nodemailer": "^10.0.10",
     "uuid": "^11.1.0",
     "zod": "^4.1.11"
   },
@@ -47,6 +49,7 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/morgan": "^1.9.10",
     "@types/node": "^24.5.2",
+    "@types/nodemailer": "^8.0.2",
     "@types/uuid": "^10.0.0",
     "prisma": "^6.16.3",
     "tsx": "^4.23.15",
