@@ -1,22 +1,19 @@
-import { Request, Response } from "express";
-import * as dashboardService from "../services/dashboardService";
+import {api} from "./api";
+
+export interface DashboardStats {
+  products: number;
+  receipts: number;
+  deliveries: number;
+  warehouses: number;
+  locations: number;
+}
 
 export const getDashboardStats =
-  async (
-    req: Request,
-    res: Response
-  ) => {
-    try {
-      const data =
-        await dashboardService.getDashboardData();
+  async (): Promise<DashboardStats> => {
+    const response =
+      await api.get(
+        "/dashboard/stats"
+      );
 
-      res.json(data);
-    } catch (error) {
-      console.error(error);
-
-      res.status(500).json({
-        message:
-          "Failed to load dashboard",
-      });
-    }
+    return response.data;
   };

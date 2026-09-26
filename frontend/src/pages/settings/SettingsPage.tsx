@@ -6,8 +6,7 @@ import {
   Typography,
 } from "@mui/material";
 
-import { useEffect, useState } from "react";
-import { api } from "../../services/api";
+import { useState } from "react";
 
 export default function SettingsPage() {
   const [companyName, setCompanyName] =
@@ -16,48 +15,21 @@ export default function SettingsPage() {
   const [adminEmail, setAdminEmail] =
     useState("");
 
-  useEffect(() => {
-    loadSettings();
-  }, []);
-
-  const loadSettings = async () => {
-    try {
-      const res =
-        await api.get("/settings");
-
-      if (res.data) {
-        setCompanyName(
-          res.data.companyName || ""
-        );
-
-        setAdminEmail(
-          res.data.adminEmail || ""
-        );
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const saveSettings = async () => {
-    try {
-      await api.post("/settings", {
+  const saveSettings = () => {
+    localStorage.setItem(
+      "stocksense_settings",
+      JSON.stringify({
         companyName,
         adminEmail,
-      });
+      })
+    );
 
-      alert("Settings saved");
-    } catch (error) {
-      console.error(error);
-    }
+    alert("Settings Saved");
   };
 
   return (
     <Card sx={{ p: 3 }}>
-      <Typography
-        variant="h4"
-        mb={3}
-      >
+      <Typography variant="h4" mb={3}>
         Settings
       </Typography>
 
@@ -66,9 +38,7 @@ export default function SettingsPage() {
           label="Company Name"
           value={companyName}
           onChange={(e) =>
-            setCompanyName(
-              e.target.value
-            )
+            setCompanyName(e.target.value)
           }
         />
 
@@ -76,9 +46,7 @@ export default function SettingsPage() {
           label="Admin Email"
           value={adminEmail}
           onChange={(e) =>
-            setAdminEmail(
-              e.target.value
-            )
+            setAdminEmail(e.target.value)
           }
         />
 
