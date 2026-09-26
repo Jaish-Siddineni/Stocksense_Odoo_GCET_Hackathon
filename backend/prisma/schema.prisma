@@ -7,16 +7,25 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+}
+
 model Product {
   id        String   @id @default(uuid())
   sku       String   @unique
   name      String
   category  String
   price     Float
-  stock     Int      @default(0)
-
+  stock     Int
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+
+  receiptItems  ReceiptItem[]
+  deliveryItems DeliveryItem[]
 }
 
 model Warehouse {
@@ -25,7 +34,7 @@ model Warehouse {
   shortCode  String
   address    String
 
-  createdAt DateTime @default(now())
+  locations  Location[]
 }
 
 model Location {
@@ -34,34 +43,60 @@ model Location {
   shortCode   String
 
   warehouseId String
-
-  createdAt DateTime @default(now())
+  warehouse   Warehouse @relation(fields: [warehouseId], references: [id])
 }
 
 model Receipt {
   id          String   @id @default(uuid())
-
-  productId   String
-
-  quantity    Int
-
   supplier    String
+  receiptDate DateTime @default(now())
 
-  receiptDate DateTime
+  items ReceiptItem[]
+}
 
-  createdAt DateTime @default(now())
+model ReceiptItem {
+  id         String   @id @default(uuid())
+
+  receiptId  String
+  productId  String
+  quantity   Int
+
+  receipt Receipt @relation(fields: [receiptId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id])
 }
 
 model Delivery {
   id           String   @id @default(uuid())
-
-  productId    String
-
-  quantity     Int
-
   customer     String
+  deliveryDate DateTime @default(now())
 
-  deliveryDate DateTime
+  items DeliveryItem[]
+}
 
+model DeliveryItem {
+  id         String   @id @default(uuid())
+
+  deliveryId String
+  productId  String
+  quantity   Int
+
+  delivery Delivery @relation(fields: [deliveryId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id])
+}
+
+model StockAdjustment {
+  id        String   @id @default(uuid())
+  productId String
+  quantity  Int
+  reason    String
   createdAt DateTime @default(now())
+}
+
+model StockMovement {
+  id           String   @id @default(uuid())
+  productId    String
+  movementType String
+  quantity     Int
+  referenceId  String?
+  createdAt    DateTime @default(now())
 }
