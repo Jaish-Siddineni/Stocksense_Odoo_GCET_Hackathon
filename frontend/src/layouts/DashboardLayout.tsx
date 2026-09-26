@@ -6,10 +6,10 @@ import {
   ListItemText,
   Toolbar,
   Typography,
-  AppBar
+  AppBar,
 } from "@mui/material";
 
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
 
 const drawerWidth = 240;
 
@@ -20,12 +20,13 @@ const menuItems = [
   { label: "Products", path: "/products" },
   { label: "Warehouses", path: "/warehouses" },
   { label: "Locations", path: "/locations" },
-  { label: "Move History", path: "/move-history" },
-  { label: "Settings", path: "/settings" }
+  { label: "Move History", path: "/movements" },
+  { label: "Settings", path: "/settings" },
 ];
 
 export default function DashboardLayout() {
   const navigate = useNavigate();
+  const location = useLocation();
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -33,11 +34,17 @@ export default function DashboardLayout() {
         position="fixed"
         sx={{
           zIndex: 1201,
-          bgcolor: "#0f172a"
+          bgcolor: "#0f172a",
         }}
       >
         <Toolbar>
-          <Typography variant="h6">
+          <Typography
+            variant="h6"
+            sx={{
+              fontWeight: 700,
+              letterSpacing: 1,
+            }}
+          >
             StockSense
           </Typography>
         </Toolbar>
@@ -47,9 +54,13 @@ export default function DashboardLayout() {
         variant="permanent"
         sx={{
           width: drawerWidth,
+          flexShrink: 0,
+
           "& .MuiDrawer-paper": {
-            width: drawerWidth
-          }
+            width: drawerWidth,
+            boxSizing: "border-box",
+            borderRight: "1px solid #e5e7eb",
+          },
         }}
       >
         <Toolbar />
@@ -58,6 +69,7 @@ export default function DashboardLayout() {
           {menuItems.map((item) => (
             <ListItemButton
               key={item.label}
+              selected={location.pathname === item.path}
               onClick={() => navigate(item.path)}
             >
               <ListItemText primary={item.label} />
@@ -72,10 +84,11 @@ export default function DashboardLayout() {
           flexGrow: 1,
           p: 4,
           bgcolor: "#f8fafc",
-          minHeight: "100vh"
+          minHeight: "100vh",
         }}
       >
         <Toolbar />
+
         <Outlet />
       </Box>
     </Box>

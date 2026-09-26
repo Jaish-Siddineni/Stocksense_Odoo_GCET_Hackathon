@@ -1,7 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 
 import PrivateRoute from "./PrivateRoute";
-
 import DashboardLayout from "../layouts/DashboardLayout";
 
 /* Auth */
@@ -47,18 +46,16 @@ import SettingsPage from "../pages/settings/SettingsPage";
 export default function AppRoutes() {
   return (
     <Routes>
-      {/* Auth Routes */}
+      {/* AUTH */}
 
       <Route path="/login" element={<LoginPage />} />
-
       <Route path="/register" element={<RegisterPage />} />
-
       <Route
         path="/forgot-password"
         element={<ForgotPasswordPage />}
       />
 
-      {/* Protected Routes */}
+      {/* PROTECTED */}
 
       <Route
         element={
@@ -67,125 +64,109 @@ export default function AppRoutes() {
           </PrivateRoute>
         }
       >
+        {/* Redirect root */}
+        <Route
+          index
+          element={<Navigate to="/dashboard" replace />}
+        />
+
         {/* Dashboard */}
-
-        <Route path="/" element={<DashboardPage />} />
-
         <Route
           path="/dashboard"
           element={<DashboardPage />}
         />
 
         {/* Products */}
-
         <Route
           path="/products"
           element={<ProductsPage />}
         />
-
         <Route
           path="/products/create"
           element={<ProductCreatePage />}
         />
-
         <Route
           path="/products/:id"
           element={<ProductDetailsPage />}
         />
-
         <Route
           path="/products/:id/edit"
           element={<ProductEditPage />}
         />
 
         {/* Receipts */}
-
         <Route
           path="/receipts"
           element={<ReceiptListPage />}
         />
-
         <Route
           path="/receipts/create"
           element={<CreateReceiptPage />}
         />
-
         <Route
           path="/receipts/:id"
           element={<ReceiptDetailsPage />}
         />
 
         {/* Deliveries */}
-
         <Route
           path="/deliveries"
           element={<DeliveryListPage />}
         />
-
         <Route
           path="/deliveries/create"
           element={<CreateDeliveryPage />}
         />
-
         <Route
           path="/deliveries/:id"
           element={<DeliveryDetailsPage />}
         />
 
         {/* Warehouses */}
-
         <Route
           path="/warehouses"
           element={<WarehouseListPage />}
         />
-
         <Route
           path="/warehouses/create"
           element={<CreateWarehousePage />}
         />
-
         <Route
           path="/warehouses/:id"
           element={<WarehouseDetailsPage />}
         />
 
         {/* Locations */}
-
         <Route
           path="/locations"
           element={<LocationListPage />}
         />
-
         <Route
           path="/locations/create"
           element={<CreateLocationPage />}
         />
-
         <Route
           path="/locations/:id"
           element={<LocationDetailsPage />}
         />
 
         {/* Movements */}
-
         <Route
           path="/movements"
           element={<MoveHistoryPage />}
         />
 
         {/* Settings */}
-
         <Route
           path="/settings"
           element={<SettingsPage />}
         />
       </Route>
 
-      {/* Fallback */}
-
+      {/* FALLBACK */}
       <Route
         path="*"
-        element={<Navigate to="/" replace />}
+        element={<Navigate to="/dashboard" replace />}
       />
     </Routes>
   );

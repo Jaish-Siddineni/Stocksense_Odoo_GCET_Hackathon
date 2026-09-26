@@ -4,45 +4,42 @@ import {
   TextField,
   Button,
   MenuItem,
+  Typography,
 } from "@mui/material";
 
 import { useState } from "react";
-
 import { v4 as uuid } from "uuid";
 
-import {
-  useWarehouseStore,
-} from "../../store/warehouseStore";
-
-import {
-  useLocationStore,
-} from "../../store/locationStore";
+import { useWarehouseStore } from "../../store/warehouseStore";
+import { useLocationStore } from "../../store/locationStore";
 
 export default function LocationForm() {
-  const warehouses =
-    useWarehouseStore(
-      (state) => state.warehouses
-    );
+  const warehouses = useWarehouseStore(
+    (state) => state.warehouses
+  );
 
-  const addLocation =
-    useLocationStore(
-      (state) => state.addLocation
-    );
+  const addLocation = useLocationStore(
+    (state) => state.addLocation
+  );
 
-  const [name, setName] =
-    useState("");
-
-  const [shortCode, setShortCode] =
-    useState("");
-
-  const [warehouseId, setWarehouseId] =
-    useState("");
+  const [name, setName] = useState("");
+  const [shortCode, setShortCode] = useState("");
+  const [warehouseId, setWarehouseId] = useState("");
 
   const handleSave = () => {
+    if (
+      !name.trim() ||
+      !shortCode.trim() ||
+      !warehouseId
+    ) {
+      alert("Please fill all fields");
+      return;
+    }
+
     addLocation({
       id: uuid(),
-      name,
-      shortCode,
+      name: name.trim(),
+      shortCode: shortCode.trim(),
       warehouseId,
     });
 
@@ -53,8 +50,17 @@ export default function LocationForm() {
 
   return (
     <Card sx={{ p: 3 }}>
+      <Typography
+        variant="h6"
+        mb={2}
+        fontWeight={600}
+      >
+        Create Location
+      </Typography>
+
       <Stack spacing={2}>
         <TextField
+          fullWidth
           label="Location Name"
           value={name}
           onChange={(e) =>
@@ -63,6 +69,7 @@ export default function LocationForm() {
         />
 
         <TextField
+          fullWidth
           label="Short Code"
           value={shortCode}
           onChange={(e) =>
@@ -71,13 +78,12 @@ export default function LocationForm() {
         />
 
         <TextField
+          fullWidth
           select
           label="Warehouse"
           value={warehouseId}
           onChange={(e) =>
-            setWarehouseId(
-              e.target.value
-            )
+            setWarehouseId(e.target.value)
           }
         >
           {warehouses.map((warehouse) => (

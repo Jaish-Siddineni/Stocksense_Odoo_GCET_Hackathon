@@ -1,55 +1,105 @@
 import {
+  Paper,
   Table,
   TableHead,
+  TableBody,
   TableRow,
   TableCell,
-  TableBody,
-  Paper,
+  Typography,
 } from "@mui/material";
 
-import ReceiptStatusBadge from "./ReceiptStatusBadge";
+import {
+  useReceiptStore,
+} from "../../store/receiptStore";
 
-const rows = [
-  {
-    id: "REC001",
-    vendor: "Steel Supplier",
-    status: "Done",
-  },
-  {
-    id: "REC002",
-    vendor: "ABC Traders",
-    status: "Ready",
-  },
-];
+import {
+  useProductStore,
+} from "../../store/productStore";
 
 export default function ReceiptTable() {
+  const receipts =
+    useReceiptStore(
+      (state) => state.receipts
+    );
+
+  const products =
+    useProductStore(
+      (state) => state.products
+    );
+
+  if (
+    receipts.length === 0
+  ) {
+    return (
+      <Typography>
+        No receipts found.
+      </Typography>
+    );
+  }
+
   return (
     <Paper>
       <Table>
         <TableHead>
           <TableRow>
-            <TableCell>Reference</TableCell>
+            <TableCell>
+              Product
+            </TableCell>
 
-            <TableCell>Vendor</TableCell>
+            <TableCell>
+              Quantity
+            </TableCell>
 
-            <TableCell>Status</TableCell>
+            <TableCell>
+              Supplier
+            </TableCell>
+
+            <TableCell>
+              Date
+            </TableCell>
           </TableRow>
         </TableHead>
 
         <TableBody>
-          {rows.map((row) => (
-            <TableRow key={row.id}>
-              <TableCell>{row.id}</TableCell>
+          {receipts.map(
+            (receipt) => {
+              const product =
+                products.find(
+                  (p) =>
+                    p.id ===
+                    receipt.productId
+                );
 
-              <TableCell>{row.vendor}</TableCell>
+              return (
+                <TableRow
+                  key={receipt.id}
+                >
+                  <TableCell>
+                    {product?.name ??
+                      "Deleted Product"}
+                  </TableCell>
 
-              <TableCell>
-                <ReceiptStatusBadge
-                  status={row.status as any}
-                />
-              </TableCell>
-            </TableRow>
-          ))}
+                  <TableCell>
+                    {
+                      receipt.quantity
+                    }
+                  </TableCell>
+
+                  <TableCell>
+                    {
+                      receipt.supplier
+                    }
+                  </TableCell>
+
+                  <TableCell>
+                    {new Date(
+                      receipt.receiptDate
+                    ).toLocaleDateString()}
+                  </TableCell>
+                </TableRow>
+              );
+            }
+          )}
         </TableBody>
       </Table>
     </Paper>

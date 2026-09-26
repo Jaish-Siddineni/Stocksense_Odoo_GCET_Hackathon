@@ -1,9 +1,12 @@
 import {
+  Paper,
   Table,
   TableHead,
   TableBody,
   TableRow,
   TableCell,
+  TableContainer,
+  Typography,
 } from "@mui/material";
 
 import { useProductStore } from "../../store/productStore";
@@ -15,40 +18,75 @@ export default function ProductTable() {
     );
 
   return (
-    <Table>
-      <TableHead>
-        <TableRow>
-          <TableCell>SKU</TableCell>
-
-          <TableCell>Name</TableCell>
-
-          <TableCell>Category</TableCell>
-
-          <TableCell>Stock</TableCell>
-        </TableRow>
-      </TableHead>
-
-      <TableBody>
-        {products.map((product) => (
-          <TableRow key={product.id}>
+    <TableContainer component={Paper}>
+      <Table>
+        <TableHead>
+          <TableRow>
             <TableCell>
-              {product.sku}
+              <strong>SKU</strong>
             </TableCell>
 
             <TableCell>
-              {product.name}
+              <strong>Name</strong>
             </TableCell>
 
             <TableCell>
-              {product.category}
+              <strong>Category</strong>
             </TableCell>
 
             <TableCell>
-              {product.stock}
+              <strong>Price</strong>
+            </TableCell>
+
+            <TableCell>
+              <strong>Stock</strong>
             </TableCell>
           </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+        </TableHead>
+
+        <TableBody>
+          {products.length === 0 ? (
+            <TableRow>
+              <TableCell
+                colSpan={5}
+                align="center"
+              >
+                <Typography
+                  color="text.secondary"
+                >
+                  No products available
+                </Typography>
+              </TableCell>
+            </TableRow>
+          ) : (
+            products.map((product) => (
+              <TableRow
+                key={product.id}
+              >
+                <TableCell>
+                  {product.sku}
+                </TableCell>
+
+                <TableCell>
+                  {product.name}
+                </TableCell>
+
+                <TableCell>
+                  {product.category}
+                </TableCell>
+
+                <TableCell>
+                  ₹{product.price}
+                </TableCell>
+
+                <TableCell>
+                  {product.stock}
+                </TableCell>
+              </TableRow>
+            ))
+          )}
+        </TableBody>
+      </Table>
+    </TableContainer>
   );
 }

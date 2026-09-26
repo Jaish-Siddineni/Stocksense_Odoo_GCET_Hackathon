@@ -5,8 +5,8 @@ export interface Product {
   name: string;
   sku: string;
   category: string;
-  stock: number;
   price: number;
+  stock: number;
 }
 
 interface ProductStore {
@@ -14,12 +14,14 @@ interface ProductStore {
 
   addProduct: (product: Product) => void;
 
-  updateProduct: (
-    id: string,
-    product: Product
+  updateStock: (
+    productId: string,
+    quantity: number
   ) => void;
 
-  deleteProduct: (id: string) => void;
+  deleteProduct: (
+    productId: string
+  ) => void;
 }
 
 export const useProductStore =
@@ -28,20 +30,36 @@ export const useProductStore =
 
     addProduct: (product) =>
       set((state) => ({
-        products: [...state.products, product],
+        products: [
+          ...state.products,
+          product,
+        ],
       })),
 
-    updateProduct: (id, product) =>
+    updateStock: (
+      productId,
+      quantity
+    ) =>
       set((state) => ({
-        products: state.products.map((p) =>
-          p.id === id ? product : p
+        products: state.products.map(
+          (product) =>
+            product.id === productId
+              ? {
+                  ...product,
+                  stock:
+                    product.stock +
+                    quantity,
+                }
+              : product
         ),
       })),
 
-    deleteProduct: (id) =>
+    deleteProduct: (productId) =>
       set((state) => ({
-        products: state.products.filter(
-          (p) => p.id !== id
-        ),
+        products:
+          state.products.filter(
+            (product) =>
+              product.id !== productId
+          ),
       })),
   }));
