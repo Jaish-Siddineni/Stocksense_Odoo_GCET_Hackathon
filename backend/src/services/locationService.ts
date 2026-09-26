@@ -3,8 +3,8 @@ import { prisma } from "../config/db";
 export const getLocations =
   async () => {
     return prisma.location.findMany({
-      orderBy: {
-        createdAt: "desc",
+      include: {
+        warehouse: true,
       },
     });
   };
@@ -13,6 +13,10 @@ export const getLocationById =
   async (id: string) => {
     return prisma.location.findUnique({
       where: { id },
+
+      include: {
+        warehouse: true,
+      },
     });
   };
 

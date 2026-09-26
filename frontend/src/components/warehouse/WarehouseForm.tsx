@@ -6,19 +6,9 @@ import {
 } from "@mui/material";
 
 import { useState } from "react";
-
-import { v4 as uuid } from "uuid";
-
-import {
-  useWarehouseStore,
-} from "../../store/warehouseStore";
+import { api } from "../../services/api";
 
 export default function WarehouseForm() {
-  const addWarehouse =
-    useWarehouseStore(
-      (state) => state.addWarehouse
-    );
-
   const [name, setName] =
     useState("");
 
@@ -28,18 +18,21 @@ export default function WarehouseForm() {
   const [address, setAddress] =
     useState("");
 
-  const handleSubmit = () => {
-    addWarehouse({
-      id: uuid(),
-      name,
-      shortCode,
-      address,
-    });
+  const saveWarehouse =
+    async () => {
+      await api.post(
+        "/warehouses",
+        {
+          name,
+          shortCode,
+          address,
+        }
+      );
 
-    setName("");
-    setShortCode("");
-    setAddress("");
-  };
+      setName("");
+      setShortCode("");
+      setAddress("");
+    };
 
   return (
     <Card sx={{ p: 3 }}>
@@ -56,7 +49,9 @@ export default function WarehouseForm() {
           label="Short Code"
           value={shortCode}
           onChange={(e) =>
-            setShortCode(e.target.value)
+            setShortCode(
+              e.target.value
+            )
           }
         />
 
@@ -64,13 +59,17 @@ export default function WarehouseForm() {
           label="Address"
           value={address}
           onChange={(e) =>
-            setAddress(e.target.value)
+            setAddress(
+              e.target.value
+            )
           }
         />
 
         <Button
           variant="contained"
-          onClick={handleSubmit}
+          onClick={
+            saveWarehouse
+          }
         >
           Save Warehouse
         </Button>

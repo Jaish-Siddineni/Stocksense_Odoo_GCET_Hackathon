@@ -9,38 +9,54 @@ import {
   Typography,
 } from "@mui/material";
 
-import { useProductStore } from "../../store/productStore";
+import {
+  useEffect,
+  useState,
+} from "react";
+
+import { api } from "../../services/api";
+
+interface Product {
+  id: string;
+  sku: string;
+  name: string;
+  category: string;
+  price: number;
+  stock: number;
+}
 
 export default function ProductTable() {
-  const products =
-    useProductStore(
-      (state) => state.products
-    );
+  const [products, setProducts] =
+    useState<Product[]>([]);
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const fetchProducts =
+    async () => {
+      try {
+        const response =
+          await api.get("/products");
+
+        setProducts(
+          response.data
+        );
+      } catch (error) {
+        console.error(error);
+      }
+    };
 
   return (
     <TableContainer component={Paper}>
       <Table>
         <TableHead>
           <TableRow>
-            <TableCell>
-              <strong>SKU</strong>
-            </TableCell>
-
-            <TableCell>
-              <strong>Name</strong>
-            </TableCell>
-
-            <TableCell>
-              <strong>Category</strong>
-            </TableCell>
-
-            <TableCell>
-              <strong>Price</strong>
-            </TableCell>
-
-            <TableCell>
-              <strong>Stock</strong>
-            </TableCell>
+            <TableCell>SKU</TableCell>
+            <TableCell>Name</TableCell>
+            <TableCell>Category</TableCell>
+            <TableCell>Price</TableCell>
+            <TableCell>Stock</TableCell>
           </TableRow>
         </TableHead>
 
@@ -51,39 +67,52 @@ export default function ProductTable() {
                 colSpan={5}
                 align="center"
               >
-                <Typography
-                  color="text.secondary"
-                >
+                <Typography>
                   No products available
                 </Typography>
               </TableCell>
             </TableRow>
           ) : (
-            products.map((product) => (
-              <TableRow
-                key={product.id}
-              >
-                <TableCell>
-                  {product.sku}
-                </TableCell>
+            products.map(
+              (product) => (
+                <TableRow
+                  key={
+                    product.id
+                  }
+                >
+                  <TableCell>
+                    {
+                      product.sku
+                    }
+                  </TableCell>
 
-                <TableCell>
-                  {product.name}
-                </TableCell>
+                  <TableCell>
+                    {
+                      product.name
+                    }
+                  </TableCell>
 
-                <TableCell>
-                  {product.category}
-                </TableCell>
+                  <TableCell>
+                    {
+                      product.category
+                    }
+                  </TableCell>
 
-                <TableCell>
-                  ₹{product.price}
-                </TableCell>
+                  <TableCell>
+                    ₹
+                    {
+                      product.price
+                    }
+                  </TableCell>
 
-                <TableCell>
-                  {product.stock}
-                </TableCell>
-              </TableRow>
-            ))
+                  <TableCell>
+                    {
+                      product.stock
+                    }
+                  </TableCell>
+                </TableRow>
+              )
+            )
           )}
         </TableBody>
       </Table>

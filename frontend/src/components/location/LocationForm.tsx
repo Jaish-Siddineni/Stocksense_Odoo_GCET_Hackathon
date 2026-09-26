@@ -1,108 +1,135 @@
 import {
   Card,
-  Stack,
-  TextField,
-  Button,
-  MenuItem,
   Typography,
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableCell,
+  CircularProgress,
+  Box,
 } from "@mui/material";
 
-import { useState } from "react";
-import { v4 as uuid } from "uuid";
+import { useEffect, useState } from "react";
+import { api } from "../../services/api";
 
-import { useWarehouseStore } from "../../store/warehouseStore";
-import { useLocationStore } from "../../store/locationStore";
+interface Movement {
+  id: string;
+  productId: string;
+  movementType: string;
+  quantity: number;
+  referenceId?: string;
+  createdAt: string;
+}
 
-export default function LocationForm() {
-  const warehouses = useWarehouseStore(
-    (state) => state.warehouses
-  );
+export default function MoveHistoryPage() {
+  const [movements, setMovements] = useState<Movement[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const addLocation = useLocationStore(
-    (state) => state.addLocation
-  );
+  useEffect(() => {
+    fetchMovements();
+  }, []);
 
-  const [name, setName] = useState("");
-  const [shortCode, setShortCode] = useState("");
-  const [warehouseId, setWarehouseId] = useState("");
+  const fetchMovements = async () => {
+    try {
+      const res = await api.get("/movements");
 
-  const handleSave = () => {
-    if (
-      !name.trim() ||
-      !shortCode.trim() ||
-      !warehouseId
-    ) {
-      alert("Please fill all fields");
-      return;
+      if (Array.isArray(res.data)) {
+        setMovements(res.data);
+      } else {
+        console.error(
+          "Expected array but received:",
+          res.data
+        );
+        setMovements([]);
+      }
+    } catch (error) {
+      console.error(
+        "Error fetching movements:",
+        error
+      );
+      setMovements([]);
+    } finally {
+      setLoading(false);
     }
-
-    addLocation({
-      id: uuid(),
-      name: name.trim(),
-      shortCode: shortCode.trim(),
-      warehouseId,
-    });
-
-    setName("");
-    setShortCode("");
-    setWarehouseId("");
   };
+
+  if (loading) {
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        p={4}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
     <Card sx={{ p: 3 }}>
       <Typography
-        variant="h6"
-        mb={2}
-        fontWeight={600}
+        variant="h4"
+        mb={3}
       >
-        Create Location
+        Stock Movements
       </Typography>
 
-      <Stack spacing={2}>
-        <TextField
-          fullWidth
-          label="Location Name"
-          value={name}
-          onChange={(e) =>
-            setName(e.target.value)
-          }
-        />
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>ID</TableCell>
+            <TableCell>Product ID</TableCell>
+            <TableCell>Type</TableCell>
+            <TableCell>Quantity</TableCell>
+            <TableCell>Reference</TableCell>
+            <TableCell>Date</TableCell>
+          </TableRow>
+        </TableHead>
 
-        <TextField
-          fullWidth
-          label="Short Code"
-          value={shortCode}
-          onChange={(e) =>
-            setShortCode(e.target.value)
-          }
-        />
+        <TableBody>
+          {movements.length === 0 ? (
+            <TableRow>
+              <TableCell
+                colSpan={6}
+                align="center"
+              >
+                No stock movements found
+              </TableCell>
+            </TableRow>
+          ) : (
+            movements.map((movement) => (
+              <TableRow key={movement.id}>
+                <TableCell>
+                  {movement.id}
+                </TableCell>
 
-        <TextField
-          fullWidth
-          select
-          label="Warehouse"
-          value={warehouseId}
-          onChange={(e) =>
-            setWarehouseId(e.target.value)
-          }
-        >
-          {warehouses.map((warehouse) => (
-            <MenuItem
-              key={warehouse.id}
-              value={warehouse.id}
-            >
-              {warehouse.name}
-            </MenuItem>
-          ))}
-        </TextField>
+                <TableCell>
+                  {movement.productId}
+                </TableCell>
 
-        <Button
-          variant="contained"
-          onClick={handleSave}
-        >
-          Save Location
-        </Button>
-      </Stack>
+                <TableCell>
+                  {movement.movementType}
+                </TableCell>
+
+                <TableCell>
+                  {movement.quantity}
+                </TableCell>
+
+                <TableCell>
+                  {movement.referenceId || "-"}
+                </TableCell>
+
+                <TableCell>
+                  {new Date(
+                    movement.createdAt
+                  ).toLocaleString()}
+                </TableCell>
+              </TableRow>
+            ))
+          )}
+        </TableBody>
+      </Table>
     </Card>
   );
 }

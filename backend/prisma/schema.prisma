@@ -32,7 +32,7 @@ model Product {
   name      String
   category  String
   price     Float
-  stock     Int
+  stock     Int      @default(0)
   createdAt DateTime @default(now())
 
   receiptItems  ReceiptItem[]
@@ -44,6 +44,7 @@ model Warehouse {
   name       String
   shortCode  String
   address    String
+  createdAt  DateTime @default(now())
 
   locations  Location[]
 }
@@ -53,8 +54,10 @@ model Location {
   name        String
   shortCode   String
 
-  warehouseId String
-  warehouse   Warehouse @relation(fields: [warehouseId], references: [id])
+  warehouseId String?
+  warehouse   Warehouse? @relation(fields: [warehouseId], references: [id])
+
+  createdAt   DateTime @default(now())
 }
 
 model Receipt {
@@ -66,7 +69,7 @@ model Receipt {
 }
 
 model ReceiptItem {
-  id         String   @id @default(uuid())
+  id         String @id @default(uuid())
 
   receiptId  String
   productId  String
@@ -85,7 +88,7 @@ model Delivery {
 }
 
 model DeliveryItem {
-  id         String   @id @default(uuid())
+  id         String @id @default(uuid())
 
   deliveryId String
   productId  String
@@ -110,4 +113,10 @@ model StockMovement {
   quantity     Int
   referenceId  String?
   createdAt    DateTime @default(now())
+}
+
+model Setting {
+  id          String @id @default(uuid())
+  companyName String
+  adminEmail  String
 }

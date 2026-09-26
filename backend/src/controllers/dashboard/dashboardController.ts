@@ -1,36 +1,20 @@
-import { prisma } from "../../config/db";
+import { Request, Response } from "express";
+import * as dashboardService from "../../services/dashboardService";
 
-export const getDashboardData =
-  async () => {
-    const products =
-      await prisma.product.count();
+export const getDashboardData = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const data =
+      await dashboardService.getDashboardData();
 
-    const warehouses =
-      await prisma.warehouse.count();
+    res.status(200).json(data);
+  } catch (error) {
+    console.error(error);
 
-    const locations =
-      await prisma.location.count();
-
-    const receipts =
-      await prisma.receipt.count();
-
-    const deliveries =
-      await prisma.delivery.count();
-
-    const stockValue =
-      await prisma.product.aggregate({
-        _sum: {
-          stock: true,
-        },
-      });
-
-    return {
-      products,
-      warehouses,
-      locations,
-      receipts,
-      deliveries,
-      totalStock:
-        stockValue._sum.stock || 0,
-    };
-  };
+    res.status(500).json({
+      message: "Failed to load dashboard",
+    });
+  }
+};

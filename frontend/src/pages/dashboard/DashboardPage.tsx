@@ -2,14 +2,56 @@ import {
   Grid,
   Card,
   Typography,
-  Button
+  Button,
 } from "@mui/material";
+
+import {
+  useEffect,
+  useState,
+} from "react";
 
 import KPIBox from "../../components/dashboard/KPIBox";
 import InventoryChart from "../../components/dashboard/InventoryChart";
 import RecentActivity from "../../components/dashboard/RecentActivity";
 
+import {
+  getDashboardStats,
+} from "../../services/dashboardService";
+
+interface DashboardStats {
+  products: number;
+  receipts: number;
+  deliveries: number;
+  warehouses: number;
+  locations: number;
+}
+
 export default function DashboardPage() {
+  const [stats, setStats] =
+    useState<DashboardStats>({
+      products: 0,
+      receipts: 0,
+      deliveries: 0,
+      warehouses: 0,
+      locations: 0,
+    });
+
+  useEffect(() => {
+    loadDashboard();
+  }, []);
+
+  const loadDashboard =
+    async () => {
+      try {
+        const data =
+          await getDashboardStats();
+
+        setStats(data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
   return (
     <>
       <Typography
@@ -24,38 +66,33 @@ export default function DashboardPage() {
         <Grid size={{ xs: 12, md: 3 }}>
           <KPIBox
             title="Products"
-            value={248}
+            value={stats.products}
           />
         </Grid>
 
         <Grid size={{ xs: 12, md: 3 }}>
           <KPIBox
             title="Receipts"
-            value={14}
+            value={stats.receipts}
           />
         </Grid>
 
         <Grid size={{ xs: 12, md: 3 }}>
           <KPIBox
             title="Deliveries"
-            value={8}
+            value={stats.deliveries}
           />
         </Grid>
 
         <Grid size={{ xs: 12, md: 3 }}>
           <KPIBox
             title="Warehouses"
-            value={4}
+            value={stats.warehouses}
           />
         </Grid>
 
         <Grid size={{ xs: 12, md: 8 }}>
-          <Card
-            sx={{
-              p: 3,
-              borderRadius: 4
-            }}
-          >
+          <Card sx={{ p: 3 }}>
             <Typography variant="h6">
               Inventory Levels
             </Typography>
@@ -75,15 +112,10 @@ export default function DashboardPage() {
             </Typography>
 
             <Typography>
-              4 To Receive
+              Total Receipts:
+              {" "}
+              {stats.receipts}
             </Typography>
-
-            <Button
-              variant="contained"
-              sx={{ mt: 2 }}
-            >
-              View Receipts
-            </Button>
           </Card>
         </Grid>
 
@@ -94,15 +126,10 @@ export default function DashboardPage() {
             </Typography>
 
             <Typography>
-              4 To Deliver
+              Total Deliveries:
+              {" "}
+              {stats.deliveries}
             </Typography>
-
-            <Button
-              variant="contained"
-              sx={{ mt: 2 }}
-            >
-              View Deliveries
-            </Button>
           </Card>
         </Grid>
       </Grid>

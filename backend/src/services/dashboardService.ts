@@ -1,36 +1,34 @@
 import { prisma } from "../config/db";
 
-export const getDashboardData =
-  async () => {
-    const products =
-      await prisma.product.count();
+export const getDashboardData = async () => {
+  const [
+    products,
+    warehouses,
+    locations,
+    receipts,
+    deliveries,
+  ] = await Promise.all([
+    prisma.product.count(),
+    prisma.warehouse.count(),
+    prisma.location.count(),
+    prisma.receipt.count(),
+    prisma.delivery.count(),
+  ]);
 
-    const warehouses =
-      await prisma.warehouse.count();
+  const stock =
+    await prisma.product.aggregate({
+      _sum: {
+        stock: true,
+      },
+    });
 
-    const locations =
-      await prisma.location.count();
-
-    const receipts =
-      await prisma.receipt.count();
-
-    const deliveries =
-      await prisma.delivery.count();
-
-    const stockValue =
-      await prisma.product.aggregate({
-        _sum: {
-          stock: true,
-        },
-      });
-
-    return {
-      products,
-      warehouses,
-      locations,
-      receipts,
-      deliveries,
-      totalStock:
-        stockValue._sum.stock || 0,
-    };
+  return {
+    products,
+    warehouses,
+    locations,
+    receipts,
+    deliveries,
+    totalStock:
+      stock._sum.stock || 0,
   };
+};
